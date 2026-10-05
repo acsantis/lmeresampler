@@ -30,6 +30,14 @@
       cls <- sample(seq_along(g_rows), replace = resample[i])
       idx <- unlist(g_rows[cls], recursive = FALSE)
       res <- res[idx, ]
+      # Fresh IDs: each resampled cluster -- duplicates included -- becomes an
+      # independent cluster in the refit, mirroring the original sampling
+      # design (J independent draws = J independent clusters). Retaining the
+      # original IDs refits duplicates as single, larger clusters, which
+      # understates cluster-level variation and biases bootstrap SEs downward.
+      res[[cluster[1]]] <- factor(
+        rep(seq_along(cls), times = lengths(g_rows[cls]))
+      )
     } else {
       if (i == length(cluster) & resample[i]) {
         dots <- as.name(cluster[-i])
